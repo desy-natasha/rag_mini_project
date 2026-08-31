@@ -5,6 +5,12 @@ This repository contains the data source and notebooks for a personal project bu
 
 The project is built with both raw Python and LangChain to compare their code efficiency and implementation tradeoffs.
 
+## Live demo
+
+The LangChain version is deployed as an interactive Streamlit app: **[Study Assistant](https://desystudyassistant.streamlit.app)**
+
+The app supports multi-turn conversation: follow-up questions are automatically rewritten into standalone queries before retrieval, and thus the assistant can handle references to earlier queries (e.g. "can you give an example of that?").
+
 ## Architecture
 Below is the pipeline overview for this project splitted into two main stages. The first stage processes and stores the source text, so it can be reused across different queries. The second stage runs every time a query is received, using the stored data to generate an answer.
 
@@ -17,9 +23,12 @@ PDF Files → Extract Text → Clean Text → Chunk Text → Embed Chunks → St
 **Query**
 
 ```
-User Query → Embed Query → Retrieve Top-k Chunks → Build Prompt → Generate Answer → Return Answer with Sources
+User Query → Embed Query → Retrieve Top-k Chunks → Build Prompt (with History + Context) → Generate Answer → Return Answer with Sources
 ```
-We used `SentenceTransformer` for the embeddings and `Llama3.1:8b` as the LLM for generating answers through Ollama.
+
+We used `SentenceTransformer` for the embeddings. For answer generation, the notebooks use `Llama3.1:8b` through Ollama for local development. 
+
+The deployed Streamlit app uses `openai/gpt-oss-20b` through the Groq API, since Ollama requires a local model server and is not available for cloud deployment.
 
 ## Repository structure
 
@@ -28,3 +37,4 @@ We used `SentenceTransformer` for the embeddings and `Llama3.1:8b` as the LLM fo
 * **chroma_db_langchain/** - Persisted vector store from LangChain
 * **`study_assistant_rag.ipynb`** - RAG pipeline notebook using raw Python
 * **`study_assistant_rag_langchain.ipynb`** - RAG pipeline notebook using LangChain
+* **`app_langchain.py`** - Streamlit app version of the LangChain pipeline for deployment
